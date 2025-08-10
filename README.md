@@ -112,14 +112,14 @@ curl -X POST http://localhost:8080/v1/login \
       }'
 ```
 
-3. Refresh Tokens
+3. Refresh Tokens - POST /v1/refresh
 
 ```bash
 curl -X POST http://localhost:8080/v1/refresh \
   -H "Refresh_Token: Bearer your_refresh_token_here"
 ```
 
-4. Logout User
+4. Logout User - POST /v1/logout
 
 ```bash
 curl -X POST http://localhost:8080/v1/logout \
