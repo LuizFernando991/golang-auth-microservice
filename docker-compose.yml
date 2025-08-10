@@ -1,0 +1,43 @@
+version: "3.8"
+services:
+  auth-db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: authdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+
+  auth-redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    depends_on:
+      auth-db:
+        condition: service_healthy
+      auth-redis:
+        condition: service_started
+    environment:
+      - DATABASE_URL=postgres://postgres:postgres@auth-db:5432/authdb?sslmode=disable
+      - REDIS_URL=auth-redis:6379
+      - JWT_SECRET=devsecretreplacewithstrong
+      - PORT=8080
+      - BCRYPT_COST=12
+      - APP_ENV=development
+    ports:
+      - "8080:8080"
+    entrypoint: ["/app/entrypoint.sh"]
+    command: ["/auth"]
+
+volumes:
+  auth-db-data:
